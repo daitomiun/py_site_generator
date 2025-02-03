@@ -1,21 +1,25 @@
 import unittest
 
-from textnode import TextNode, TextType
+from htmlnode import HTMLNode
 from constants import *
+from textnode import TextNode, TextType
 
 class TestHTMLNode(unittest.TestCase):
-    def test_eq(self):
-        node = TextNode("This is a text node", TextType.BOLD)
-        node2 = TextNode("This is a text node", TextType.BOLD)
-        self.assertEqual(node, node2)
+    
+    def test_props_eq(self):
+        html_node = HTMLNode(props=A_PROPS)
+        self.assertEqual(html_node.props_to_html(), EXPECTED_PROPS)
 
-    def test_to_html_not_impl(self):
-        node = TextNode("This is a text node", TextType.BOLD)
-        self.assertEqual(node.url, None)
+    def test_html_node_values(self):
+        text_node = TextNode(A_VALUE, TextType.DEFAULT)
+        html_node = HTMLNode(tag=A_TAG, value=text_node.text, props=A_PROPS)
 
-    def test_props_to_html(self):
-        node = TextNode("This is a text node", "hello")
-        self.assertEqual(node.text_type, TextType.DEFAULT.value)
+        result_html_node = repr(html_node)
+        self.assertEqual(result_html_node, repr(EXPECTED_HTML_NODE))
+
+    def test_none_props_to_html(self):
+        html_node = HTMLNode()
+        self.assertEqual(html_node.props_to_html(), EXPECTED_NONE_PROPS)
 
 if __name__ == "__main__":
     unittest.main()
