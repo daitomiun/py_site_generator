@@ -9,6 +9,9 @@ A_PROPS={
     "href": "https://www.google.com", 
     "target": "_blank",
 }
+A_WITH_TAG_PROPS_HTML = """<a href="https://www.google.com" target="_blank" >hello from boot.dev!</a>"""
+A_VALUE_HTML = A_VALUE
+A_WITHOUT_PROPS_HTML = """<a >hello from boot.dev!</a>"""
 
 EXPECTED_PROPS = """href="https://www.google.com" target="_blank" """
 EXPECTED_NONE_PROPS = ""
