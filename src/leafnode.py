@@ -11,5 +11,5 @@ class LeafNode(HTMLNode):
             return self.value
 
         props = self.props_to_html()
-        return f'<{self.tag} {props}>{self.value}</{self.tag}>'
+        return f'<{self.tag}{props}>{self.value}</{self.tag}>'
 

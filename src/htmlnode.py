@@ -16,9 +16,7 @@ class HTMLNode():
         if self.props != None:
             html_props = ""
             for prop in self.props:
-                html_props += f"""{prop}="{self.props[prop]}" """
-            return html_props
+                html_props += f'{prop}="{self.props[prop]}" '
+            return " " + html_props.rstrip()
         return ""
-
-        
 
