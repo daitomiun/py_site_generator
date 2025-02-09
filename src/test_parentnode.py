@@ -18,7 +18,6 @@ class TestParentNode(unittest.TestCase):
         html_parent_node = COMPLEX_PARENT_NODE
         self.assertEqual(html_parent_node.to_html(), COMPLEX_PARENT_NODE_RESULT)
 
-
     def test_invalid_parent_node_emtpy_tag(self):
         html_parent_node = INVALID_NODE_EMPTY_TAG
         with self.assertRaisesRegex(ValueError, "ERR: The parent Node needs a tag value"):
@@ -48,5 +47,7 @@ class TestParentNode(unittest.TestCase):
         html_parent_node = INVALID_NODE_NOT_A_HTML_NODE
         with self.assertRaisesRegex(ValueError, "ERR: All children must be HTMLNode objects"):
             html_parent_node.to_html()
+
 if __name__ == "__main__":
     unittest.main()
+

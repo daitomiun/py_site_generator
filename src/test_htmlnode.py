@@ -11,7 +11,7 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(html_node.props_to_html(), EXPECTED_PROPS)
 
     def test_html_node_values(self):
-        text_node = TextNode(A_VALUE, TextType.DEFAULT)
+        text_node = TextNode(A_VALUE, TextType.LINK)
         html_node = HTMLNode(tag=A_TAG, value=text_node.text, props=A_PROPS)
 
         result_html_node = repr(html_node)

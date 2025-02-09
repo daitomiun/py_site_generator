@@ -18,7 +18,7 @@ EXPECTED_PROPS = ' href="https://www.google.com" target="_blank"'
 EXPECTED_NONE_PROPS = ""
 EXPECTED_VALUE = A_VALUE
 
-EXPECTED_TEXT_NODE = TextNode(A_VALUE, TextType.DEFAULT)
+EXPECTED_TEXT_NODE = TextNode(A_VALUE, TextType.TEXT)
 EXPECTED_HTML_NODE = HTMLNode(tag=A_TAG, value=EXPECTED_TEXT_NODE.text, props=A_PROPS)
 
 

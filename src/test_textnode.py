@@ -11,11 +11,11 @@ class TestTextNode(unittest.TestCase):
 
     def test_none_url(self):
         node = TextNode("This is a text node", TextType.BOLD)
-        self.assertEqual(node.url, None)
+        self.assertEqual(node.url, "")
 
     def test_diff_text_type(self):
-        node = TextNode("This is a text node", "hello")
-        self.assertEqual(node.text_type, TextType.DEFAULT.value)
+        with self.assertRaisesRegex(ValueError, "ERR: text_type in the text node needs to be of TextType"):
+            TextNode("This is a text node", "hello")
 
 if __name__ == "__main__":
     unittest.main()
