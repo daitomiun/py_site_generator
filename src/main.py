@@ -27,8 +27,31 @@ def main():
     text_node = TextNode("hello", TextType.IMAGE, "https://www.example.com/image.png")
     print(repr(text_node_to_html_node(text_node)))
     print("---------------------------------")
+    test_node = TextNode("This is **bold** and **more bold** text", TextType.TEXT)
+    print(split_nodes_delimiter([test_node], '**', TextType.BOLD))
+    
+    test_node = TextNode("**Bold** at start and **Bold** at **end**", TextType.TEXT)
+    print(split_nodes_delimiter([test_node], '**', TextType.BOLD))
+
+    test_node = TextNode("This has **unclosed bold", TextType.TEXT)
+    print(split_nodes_delimiter([test_node], '**', TextType.BOLD))
+
+    test_node = TextNode("Empty **** delimiters", TextType.TEXT)
+    print(split_nodes_delimiter([test_node], '**', TextType.BOLD))
     '''
-    text = "This is text with a `code block`` word"
-    text_node = TextNode(text, TextType.BOLD)
-    print(split_nodes_delimiter([text_node], '`', TextType.CODE))
+    # Test code blocks with backticks
+    code_node = TextNode("Here is `some code` and `more code`", TextType.TEXT)
+    code_result = split_nodes_delimiter([code_node], "`", TextType.CODE)
+    print(code_result)
+
+    # Test italics with single asterisk
+    italic_node = TextNode("Here is *italic text* and *more italic*", TextType.TEXT)
+    italic_result = split_nodes_delimiter([italic_node], "*", TextType.ITALIC)
+    print(italic_result)
+
+    # Test empty delimiter (should raise error)
+    try:
+        bad_result = split_nodes_delimiter([code_node], "", TextType.CODE)
+    except ValueError as e:
+        print(f"Correctly caught error: {e}")
 main()
