@@ -1,6 +1,6 @@
 import unittest
 
-from md_text_to_text import split_nodes_delimiter
+from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter
 from textnode import TextNode, TextType
 
 class TestMDTextToTextNode(unittest.TestCase):
@@ -91,6 +91,48 @@ class TestMDTextToTextNode(unittest.TestCase):
         self.assertEqual(result[3].text_type, TextType.BOLD)
         self.assertEqual(result[4].text, " text")
         self.assertEqual(len(result), 5)
+
+    def test_valid_markdown_image_extraction(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_images(text)
+
+        self.assertEqual(result, [('rick roll', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')])
+        self.assertEqual(len(result), 2)
+
+    def test_invalid_markdown_image_brackets_extraction(self):
+        text = "This is text with a ![rick [] roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_images(text)
+
+        self.assertEqual(result, [('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')])
+        self.assertEqual(len(result), 1)
+
+    def test_invalid_markdown_image_parenthesis_extraction(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif ()) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_images(text)
+
+        self.assertEqual(result, [('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')])
+        self.assertEqual(len(result), 1)
+
+    def test_valid_markdown_link_extraction(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        result = extract_markdown_links(text)
+
+        self.assertEqual(result, [('to boot dev', 'https://www.boot.dev'), ('to youtube', 'https://www.youtube.com/@bootdotdev')])
+        self.assertEqual(len(result), 2)
+
+    def test_invalid_markdown_brackets_link_extraction(self):
+        text = "This is text with a link [to boot [hello] dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        result = extract_markdown_links(text)
+
+        self.assertEqual(result, [('to youtube', 'https://www.youtube.com/@bootdotdev')])
+        self.assertEqual(len(result), 1)
+
+    def test_invalid_markdown_link_parenthesis_extraction(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev ()) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        result = extract_markdown_links(text)
+
+        self.assertEqual(result, [('to youtube', 'https://www.youtube.com/@bootdotdev')])
+        self.assertEqual(len(result), 1)
 
 if __name__ == "__main__":
     unittest.main()

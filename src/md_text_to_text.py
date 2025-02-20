@@ -1,7 +1,7 @@
+import re
 from textnode import TextNode, TextType
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
-
     if len(delimiter) == 0 or delimiter == "":
         raise ValueError(f"Invalid empty delimeter")
 
@@ -24,6 +24,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
             new_nodes.append(TextNode(text=node.text[start + len(delimiter):end], text_type=text_type))
             pos = end + len(delimiter)
-
     return new_nodes
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text) 
+
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text) 
 

@@ -1,5 +1,5 @@
 from leafnode import LeafNode
-from md_text_to_text import split_nodes_delimiter
+from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter
 from parentnode import ParentNode
 from text_to_html import text_node_to_html_node
 from textnode import TextNode, TextType
@@ -49,7 +49,6 @@ def main():
         print(f"Correctly caught error: {e}")
     bold_node = TextNode("**Bold** at start and **Bold** at **end**", TextType.TEXT)
     print(split_nodes_delimiter([bold_node], '**', TextType.BOLD))
-    '''
     mixed_nodes = [
         TextNode("Here is **bold** text", TextType.TEXT),
         TextNode("This is untouched node", TextType.BOLD)  # Non-TextType node
@@ -76,8 +75,19 @@ def main():
     # - TextNode("bold", TextType.BOLD)
     # - TextNode("", TextType.BOLD)      # Empty after bold content
     # - TextNode(" text", TextType.TEXT)
-
     print(result)
+    '''
+    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    print(extract_markdown_images(text))
+    # [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+    text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    print(extract_markdown_links(text))
+    # [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+    # invalid mark down link
+    text = "This is text with a link [to boot [hello] dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    print(extract_markdown_links(text))
 
-
+    text = "This is text with a ![rick [] roll](https://i.imgur.com/aKaOqIh.gif []) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    print(extract_markdown_images(text))
+ 
 main()
