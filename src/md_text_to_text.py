@@ -49,7 +49,7 @@ def split_nodes_link(old_nodes):
 
 def get_split_nodes(old_nodes, text_type, extract, left_delimiter, right_delimiter, url_left, url_right):
     """Split text nodes based on markdown patterns for links or images.
-    
+
     Args:
         old_nodes (list): List of TextNode objects to process
         text_type (TextType): Type of node to create (LINK or IMAGE)
@@ -58,10 +58,10 @@ def get_split_nodes(old_nodes, text_type, extract, left_delimiter, right_delimit
         right_delimiter (str): Closing delimiter for alt text ("]")
         url_left (str): Opening delimiter for URL ("(")
         url_right (str): Closing delimiter for URL (")")
-    
+
     Returns:
         list: New list of TextNode objects with markdown content split into separate nodes
-    
+
     Example:
         >>> nodes = [TextNode("Hello [world](url)", TextType.TEXT)]
         >>> get_split_nodes(nodes, TextType.LINK, extract_markdown_links, "[", "]", "(", ")")
@@ -70,8 +70,12 @@ def get_split_nodes(old_nodes, text_type, extract, left_delimiter, right_delimit
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
+        if current_text == "":
+            new_nodes.append(node)
+            continue
+
         while current_text != "":
-            links = extract(current_text) # <-- method for the extraction type
+            links = extract(current_text)
             if len(links) == 0:
                 new_nodes.append(TextNode(current_text, TextType.TEXT))
                 break

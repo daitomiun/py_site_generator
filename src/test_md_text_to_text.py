@@ -1,6 +1,6 @@
 import unittest
 
-from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter
+from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link
 from textnode import TextNode, TextType
 
 class TestMDTextToTextNode(unittest.TestCase):
@@ -133,6 +133,119 @@ class TestMDTextToTextNode(unittest.TestCase):
 
         self.assertEqual(result, [('to youtube', 'https://www.youtube.com/@bootdotdev')])
         self.assertEqual(len(result), 1)
+
+    def test_split_valid_nodes_by_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) and",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode(
+                    "to youtube", 
+                    TextType.LINK, 
+                    "https://www.youtube.com/@bootdotdev"
+                ),
+                TextNode(" and", TextType.TEXT),
+            ]
+        )
+
+    def test_split_invalid_and_valid_nodes_by_links(self):
+        node = TextNode(
+            "This is text with a link [to boot[] dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) and",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a link [to boot[] dev](https://www.boot.dev) and " , TextType.TEXT),
+                TextNode("to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"), 
+                TextNode(" and", TextType.TEXT),
+            ]
+        )
+
+    def test_split_empty_node(self):
+        node = TextNode("", TextType.TEXT)
+        self.assertEqual(split_nodes_link([node]), [node])
+
+    def test_multiple_input_nodes(self):
+        nodes = [
+            TextNode("Start [link](url) middle", TextType.TEXT),
+            TextNode("Another [link2](url2) end", TextType.TEXT)
+        ]
+        new_nodes = split_nodes_link(nodes)
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("Start " , TextType.TEXT),
+                TextNode("link", TextType.LINK, "url"),
+                TextNode(" middle", TextType.TEXT),
+                TextNode("Another " , TextType.TEXT),
+                TextNode("link2", TextType.LINK, "url2"),
+                TextNode(" end", TextType.TEXT)
+            ]
+        )
+
+    def test_url_with_special_chars(self):
+        node = TextNode("[link](https://example.com?param=value&other=123)", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [TextNode("link", TextType.LINK, "https://example.com?param=value&other=123")]
+        )
+    def test_adjacent_links(self):
+        node = TextNode("[link1](url1)[link2](url2)", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [TextNode("link1", TextType.LINK, "url1"), TextNode("link2", TextType.LINK, "url2")]
+        )
+    def test_mixed_images_and_links(self):
+        node = TextNode("![img](img_url)[link](link_url)", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [TextNode("![img](img_url)", TextType.TEXT), TextNode("link", TextType.LINK, "link_url")]
+        )
+
+    def test_split_valid_nodes_by_image(self):
+        node = TextNode(
+                "This is text with an image ![cute bear](https://example.com/bear.jpg) and some text after it",
+                TextType.TEXT,
+            )
+        new_nodes = split_nodes_image([node])
+
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with an image ", TextType.TEXT),
+                TextNode("cute bear", TextType.IMAGE, "https://example.com/bear.jpg"),
+                TextNode(" and some text after it", TextType.TEXT),
+            ]
+        )
+
+    def test_split_invalid_and_valid_nodes_by_image(self):
+        node = TextNode(
+                "This is text with an image ![cute bear](https://example.com/bear.jpg ()) and some text after it![cute bear](https://example.com/bear.jpg)",
+                TextType.TEXT,
+            )
+        new_nodes = split_nodes_image([node])
+
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with an image ![cute bear](https://example.com/bear.jpg ()) and some text after it", TextType.TEXT, ), 
+                TextNode("cute bear", TextType.IMAGE, "https://example.com/bear.jpg")
+            ]
+        )
 
 if __name__ == "__main__":
     unittest.main()
