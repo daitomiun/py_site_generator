@@ -1,6 +1,6 @@
 import unittest
 
-from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link
+from md_text_to_text import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 
 class TestMDTextToTextNode(unittest.TestCase):
@@ -244,6 +244,96 @@ class TestMDTextToTextNode(unittest.TestCase):
             [
                 TextNode("This is text with an image ![cute bear](https://example.com/bear.jpg ()) and some text after it", TextType.TEXT, ), 
                 TextNode("cute bear", TextType.IMAGE, "https://example.com/bear.jpg")
+            ]
+        )
+
+    def test_valid_text_to_textnodes_with_links_images(self):
+        md_text = "Check out these [cool pics](https://pics.com) and ![sunset](https://sunset.jpg) and [another](https://test.com/path?q=1) with a ![second image](https://img2.jpg)"
+        result = text_to_textnodes(md_text)
+        self.assertEqual(
+            result,
+            [
+                TextNode("Check out these ", TextType.TEXT, ""),
+                TextNode("cool pics", TextType.LINK, "https://pics.com"),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("sunset", TextType.IMAGE, "https://sunset.jpg"),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("another", TextType.LINK, "https://test.com/path?q=1"),
+                TextNode(" with a ", TextType.TEXT, ""),
+                TextNode("second image", TextType.IMAGE, "https://img2.jpg")
+            ]
+        )
+
+    def test_valid_text_to_textnodes_with_mixed_code_links_images(self):
+        md_text = "Here's some `inline code` followed by a [link with spaces](https://api.test.com/path with spaces) and a ![complex image](https://image.com/test.jpg?size=large&type=png) and `more code`"
+        result = text_to_textnodes(md_text)
+        self.assertEqual(
+            result,
+            [
+                TextNode("Here's some ", TextType.TEXT, ""),
+                TextNode("inline code", TextType.CODE, ""),
+                TextNode(" followed by a ", TextType.TEXT, ""),
+                TextNode("link with spaces", TextType.LINK, "https://api.test.com/path with spaces"),
+                TextNode(" and a ", TextType.TEXT, ""),
+                TextNode("complex image", TextType.IMAGE, "https://image.com/test.jpg?size=large&type=png"),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("more code", TextType.CODE, "")
+            ]
+        )
+        pass
+
+    def test_valid_text_to_textnodes_with_escaped_characters(self):
+        md_text = "Test with `code & symbols` and [link & special chars](https://test.com/path?name=value&x=1) and ![image with spaces](https://api.test.com/img/1?title=sunny day&size=large) and *text with [escaped] characters*"
+        result = text_to_textnodes(md_text)
+        self.assertEqual(
+            result,
+            [
+                TextNode("Test with ", TextType.TEXT, ""),
+                TextNode("code & symbols", TextType.CODE, ""),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("link & special chars", TextType.LINK, "https://test.com/path?name=value&x=1"),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("image with spaces", TextType.IMAGE, "https://api.test.com/img/1?title=sunny day&size=large"),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode("text with [escaped] characters", TextType.ITALIC, "")
+            ]
+        )
+
+
+
+    def test_valid_text_to_textnodes_with_mixed_quotes(self):
+        md_text = """Testing "quoted" text with `code "containing" quotes` and [link "with" quotes](https://test.com/"quote"?q="hi") and ![image 'mixed' "quotes"](https://api.test.com/img?title="sunny's day") and *italic "with" quotes*"""
+        result = text_to_textnodes(md_text)
+        self.assertEqual(
+            result,
+            [
+                TextNode('Testing "quoted" text with ', TextType.TEXT, ""),
+                TextNode('code "containing" quotes', TextType.CODE, ""),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode('link "with" quotes', TextType.LINK, 'https://test.com/"quote"?q="hi"'),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode('image \'mixed\' "quotes"', TextType.IMAGE, 'https://api.test.com/img?title="sunny\'s day"'),
+                TextNode(" and ", TextType.TEXT, ""),
+                TextNode('italic "with" quotes', TextType.ITALIC, "")
+            ]
+        )
+    def test_valid_text_to_textnodes_with_mixed_delimiters_spacing(self):
+        md_text = "`code   with   spaces`[link with**bold**attempt](https://test.com)*italic  spaces  here*![image   spaces](https://img.com/test)`no spaces`**bold**[](empty link)![](empty image)"
+        result = text_to_textnodes(md_text)
+        self.assertEqual(
+            result,
+            [
+                TextNode("", TextType.TEXT, ""),
+                TextNode("code   with   spaces", TextType.CODE, ""),
+                TextNode("[link with", TextType.TEXT, ""),
+                TextNode("bold", TextType.BOLD, ""),
+                TextNode("attempt](https://test.com)", TextType.TEXT, ""),
+                TextNode("italic  spaces  here", TextType.ITALIC, ""),
+                TextNode("image   spaces", TextType.IMAGE, "https://img.com/test"),
+                TextNode("no spaces", TextType.CODE, ""),
+                TextNode("bold", TextType.BOLD, ""),
+                TextNode("", TextType.LINK, "empty link"),
+                TextNode("", TextType.IMAGE, "empty image")
             ]
         )
 

@@ -1,6 +1,27 @@
 import re
 from textnode import TextNode, TextType
 
+def text_to_textnodes(text):
+    new_nodes = []
+    delimiters = {
+        "**": TextType.BOLD,
+        "*": TextType.ITALIC, 
+        "`": TextType.CODE
+    }
+
+    new_nodes = [TextNode(text, TextType.TEXT)]
+    
+    for delimiter in delimiters:
+        new_nodes = split_nodes_delimiter(
+            old_nodes=new_nodes,
+            delimiter=delimiter,
+            text_type=delimiters[delimiter]
+        )
+    new_nodes = split_nodes_image(new_nodes)
+    new_nodes = split_nodes_link(new_nodes)
+
+    return new_nodes
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     if len(delimiter) == 0 or delimiter == "":
         raise ValueError(f"Invalid empty delimeter")
@@ -9,20 +30,20 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
             new_nodes.append(node)
-            break
+            continue
         pos = 0
         while pos < len(node.text):
             start = node.text.find(delimiter, pos)
             if start == -1:
-                new_nodes.append(TextNode(text=node.text[pos:], text_type=TextType.TEXT))
+                new_nodes.append(TextNode(text=node.text[pos:], text_type=TextType.TEXT, url=node.url))
                 break
-            new_nodes.append(TextNode(text=node.text[pos:start], text_type=TextType.TEXT))
+            new_nodes.append(TextNode(text=node.text[pos:start], text_type=TextType.TEXT, url=node.url))
 
             end = node.text.find(delimiter, start + len(delimiter))
             if end == -1:
                 raise ValueError("Unclosed delimiter")
 
-            new_nodes.append(TextNode(text=node.text[start + len(delimiter):end], text_type=text_type))
+            new_nodes.append(TextNode(text=node.text[start + len(delimiter):end], text_type=text_type, url=node.url))
             pos = end + len(delimiter)
     return new_nodes
 
@@ -48,25 +69,6 @@ def split_nodes_link(old_nodes):
     )
 
 def get_split_nodes(old_nodes, text_type, extract, left_delimiter, right_delimiter, url_left, url_right):
-    """Split text nodes based on markdown patterns for links or images.
-
-    Args:
-        old_nodes (list): List of TextNode objects to process
-        text_type (TextType): Type of node to create (LINK or IMAGE)
-        extract (function): Function to extract markdown content (links or images)
-        left_delimiter (str): Opening delimiter (e.g. "[" or "![")
-        right_delimiter (str): Closing delimiter for alt text ("]")
-        url_left (str): Opening delimiter for URL ("(")
-        url_right (str): Closing delimiter for URL (")")
-
-    Returns:
-        list: New list of TextNode objects with markdown content split into separate nodes
-
-    Example:
-        >>> nodes = [TextNode("Hello [world](url)", TextType.TEXT)]
-        >>> get_split_nodes(nodes, TextType.LINK, extract_markdown_links, "[", "]", "(", ")")
-        [TextNode("Hello ", TextType.TEXT), TextNode("world", TextType.LINK, "url")]
-    """
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
@@ -77,13 +79,13 @@ def get_split_nodes(old_nodes, text_type, extract, left_delimiter, right_delimit
         while current_text != "":
             links = extract(current_text)
             if len(links) == 0:
-                new_nodes.append(TextNode(current_text, TextType.TEXT))
+                new_nodes.append(TextNode(current_text, node.text_type, node.url))
                 break
 
             alt, url = links[0]
             sections = current_text.split(f"{left_delimiter}{alt}{right_delimiter}{url_left}{url}{url_right}", 1)
             if sections[0] != "":
-                new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                new_nodes.append(TextNode(sections[0], node.text_type, node.url))
 
             new_nodes.append(TextNode(alt, text_type, url))
             current_text = sections[1]
