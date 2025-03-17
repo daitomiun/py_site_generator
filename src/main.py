@@ -1,17 +1,18 @@
-from md_text_to_text import split_nodes_link, text_to_textnodes
-from md_to_blocks import markdown_to_blocks
-from textnode import TextNode, TextType
+from os import path
+import shutil
 
 def main():
-    md = """
-This is **bolded** paragraph
+    copy_static_to_public()
 
-This is another paragraph with _italic_ text and `code` here
-This is the same paragraph on a new line
 
-- This is a list
-- with items
-"""
-    print(markdown_to_blocks(md))
+def copy_static_to_public():
+    public, static = "./public/", "./static/"
+    if not path.exists(static):
+        raise ValueError(f"{static} path doesnt exist")
+    if path.exists(public):
+        shutil.rmtree(public)
+        print("delete public for recreate it")
+
+    shutil.copytree(static, public)
 
 main()
