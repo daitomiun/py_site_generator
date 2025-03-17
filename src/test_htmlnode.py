@@ -5,7 +5,7 @@ from constants import *
 from textnode import TextNode, TextType
 
 class TestHTMLNode(unittest.TestCase):
-    
+
     def test_props_eq(self):
         html_node = HTMLNode(props=A_PROPS)
         self.assertEqual(html_node.props_to_html(), EXPECTED_PROPS)

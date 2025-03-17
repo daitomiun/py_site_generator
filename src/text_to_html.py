@@ -15,6 +15,7 @@ def get_tag_props_from_node(node):
         case TextType.TEXT:
             return None, None, node.text
         case TextType.ITALIC:
+            print(node.text)
             return "i", None, node.text
         case TextType.CODE:
             return "code", None, node.text

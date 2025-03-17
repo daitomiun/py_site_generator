@@ -1,41 +1,17 @@
 from md_text_to_text import split_nodes_link, text_to_textnodes
+from md_to_blocks import markdown_to_blocks
 from textnode import TextNode, TextType
 
 def main():
-    node = TextNode("![img](img_url)[link](link_url)", TextType.TEXT)
-    print(split_nodes_link([node]))
+    md = """
+This is **bolded** paragraph
 
-    print("0. ---------------------------------------------")
-    md_text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    print("1. ---------------------------------------------")
-    '''
-    md_text = "This is *italic with **bold** inside* and **bold with *italic* inside**"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    print("2. ---------------------------------------------")
-    md_text = "Check out these [cool pics](https://pics.com) and ![sunset](https://sunset.jpg) and [another](https://test.com/path?q=1) with a ![second image](https://img2.jpg)"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    print("3. ---------------------------------------------")
-    md_text = "`code with *italic* attempt` and *italic with `code` attempt* and **bold with ![image](url) inside**"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    print("4. ---------------------------------------------")
-    md_text = "This has an [unclosed link and a *missing delimiter"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    '''
-    print("5. ---------------------------------------------")
-    md_text = "Check out these [cool pics](https://pics.com) and ![sunset](https://sunset.jpg) and [another](https://test.com/path?q=1) with a ![second image](https://img2.jpg)"
-    print(md_text)
-    nodes = text_to_textnodes(md_text)
-    print(nodes)
-    print("5. ---------------------------------------------")
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+    print(markdown_to_blocks(md))
+
 main()

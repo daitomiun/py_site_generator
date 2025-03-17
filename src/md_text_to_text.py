@@ -6,6 +6,7 @@ def text_to_textnodes(text):
     delimiters = {
         "**": TextType.BOLD,
         "*": TextType.ITALIC, 
+        "_": TextType.ITALIC, 
         "`": TextType.CODE
     }
 
