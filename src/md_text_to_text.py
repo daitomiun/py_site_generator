@@ -11,7 +11,7 @@ def text_to_textnodes(text):
     }
 
     new_nodes = [TextNode(text, TextType.TEXT)]
-    
+
     for delimiter in delimiters:
         new_nodes = split_nodes_delimiter(
             old_nodes=new_nodes,

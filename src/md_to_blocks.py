@@ -12,6 +12,7 @@ def block_to_block_type(block: str):
     if block.startswith("```") and block.endswith("```"):
         return BlockType.CODE
     if starts_with_valid_block(block, "> "):
+        print(f"quote: {block}")
         return BlockType.QUOTE
     if starts_with_valid_block(block, "- "):
         return BlockType.UNORDERED_LIST
@@ -29,7 +30,7 @@ def validate_ordered_list(block):
 def starts_with_valid_block(block, delimeter):
     lines = block.split('\n')
     for line in lines:
-        if not line.startswith(f"{delimeter}"):
+        if not line.startswith(delimeter.strip()):
             return False
     return True
 
