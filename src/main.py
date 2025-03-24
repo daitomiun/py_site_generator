@@ -4,26 +4,48 @@ import shutil
 from md_to_blocks import markdown_to_blocks
 from md_to_html import markdown_to_html_node
 
+dir_path_static = "./static"
+dir_content = "./content"
+dir_path_public = "./public"
+template_path = "./template.html"
+
 def main():
+    print("Deleting public directory and recreating it...")
     copy_static_to_public()
 
-    title = extract_title("# test")
-    print(title)
-
-    from_path = "./content/index.md"
-    to_path = "./public/"
-    template_path = "./template.html"
-    generate_page(from_path, template_path, to_path)
+    print("Generating page...")
+    generate_pages_recursive(
+        dir_path_content=dir_content,
+        template_path=template_path, 
+        dest_dir_path=dir_path_public
+    )
 
 def copy_static_to_public():
-    public, static = "./public/", "./static/"
-    if not path.exists(static):
-        raise ValueError(f"{static} path doesnt exist")
-    if path.exists(public):
-        shutil.rmtree(public)
+    if not path.exists(dir_path_static):
+        raise ValueError(f"{dir_path_static} path doesnt exist")
+    if path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
         print("delete public for recreate it")
 
-    shutil.copytree(static, public)
+    shutil.copytree(dir_path_static, dir_path_public)
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    object_contents = os.listdir(dir_path_content)
+    for object_content in object_contents:
+        if os.path.isfile(os.path.join(dir_path_content, object_content)):
+            generate_page(
+                from_path=os.path.join(dir_path_content, "index.md"), 
+                template_path=template_path, 
+                dest_path=os.path.join(dest_dir_path)
+            )
+        else:
+            print(f"generate page recursive: {object_content}")
+            generate_pages_recursive(
+                dir_path_content=os.path.join(dir_path_content, object_content),
+                template_path=template_path,
+                dest_dir_path=os.path.join(dest_dir_path, object_content)
+            )
 
 def extract_title(markdown):
     blocks = markdown_to_blocks(markdown)
@@ -50,6 +72,7 @@ def generate_page(from_path, template_path, dest_path):
     dest_file_path = os.path.join(dest_path, "index.html")
     with open(dest_file_path, "w") as html_result:
         html_result.write(html_to_dest_path)
+    print(f"DONE: Page Generated from {from_path} to {dest_path} using {template_path}")
 
 def update_template_placeholders(template_content, title, md_to_html):
     processed_template = template_content.replace("{{ Title }}", title)

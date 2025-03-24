@@ -12,7 +12,6 @@ def block_to_block_type(block: str):
     if block.startswith("```") and block.endswith("```"):
         return BlockType.CODE
     if starts_with_valid_block(block, "> "):
-        print(f"quote: {block}")
         return BlockType.QUOTE
     if starts_with_valid_block(block, "- "):
         return BlockType.UNORDERED_LIST
