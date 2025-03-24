@@ -82,6 +82,7 @@ def generate_page(from_path, template_path, dest_path, basepath):
 def update_template_placeholders(template_content, title, md_to_html, basepath):
     processed_template = template_content.replace("{{ Title }}", title)
     processed_template = processed_template.replace("{{ Content }}", md_to_html)
+    print(f"href={basepath} src={basepath}")
     processed_template = processed_template.replace('href="/', f'href="{basepath}')
     processed_template = processed_template.replace('src="/', f'src="{basepath}')
     return processed_template
